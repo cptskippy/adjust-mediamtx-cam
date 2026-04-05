@@ -1,0 +1,16 @@
+[Unit]
+Description=adjust mediamtx cam service
+After=network-online.target
+
+[Service]
+ExecStartPre=/bin/sleep 10
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+ExecStart=/usr/bin/python3 /home/pi/adjust-mediamtx-cam/adjust-mediamtx-cam.py
+WorkingDirectory=/home/pi/adjust-mediamtx-cam
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
