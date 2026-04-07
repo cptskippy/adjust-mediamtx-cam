@@ -10,11 +10,21 @@ import cv2
 import numpy as np
 import requests
 import time
+from urllib.parse import quote
 
 # Camera stream URL (replace with your stream source)
-STREAM_URL = "rtsp://localhost:8554/cam"
+USER = "guest"
+PASSWORD = "guest"
+EN_USER = quote(USER, safe="")
+EN_PASSWORD = quote(PASSWORD, safe="")
+STREAM_URL = f"rtsp://{EN_USER}:{EN_PASSWORD}@localhost:8554/cam"
 GET_URL = "http://localhost:9997/v3/config/paths/get/cam"
 PATCH_URL = "http://localhost:9997/v3/config/paths/patch/cam"
+
+SESSION = requests.Session()
+SESSION.auth = (USER, PASSWORD)
+
+
 
 # Define brightness-to-gain mapping parameters
 MAX_BRIGHTNESS = 110 # Stop compensating
@@ -40,7 +50,7 @@ def get_brightness(frame):
 
 def get_gain():
     # Retrieve current gain
-    response = requests.get(GET_URL)
+    response = SESSION.get(GET_URL)
     json = response.json()
     gain = json["rpiCameraGain"]
 
@@ -51,7 +61,7 @@ def get_gain():
 def update_gain(gain):
     # Send API request to update gain
     payload = {"rpiCameraGain": gain}
-    response = requests.patch(PATCH_URL, json=payload)
+    response = SESSION.patch(PATCH_URL, json=payload)
 
     return response
 
